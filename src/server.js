@@ -131,14 +131,6 @@ const init = async () => {
   server.ext('onPreResponse', (request, h) => {
     const { response } = request;
     if (response instanceof Error) {
-      if (response instanceof AuthorizationError) {
-        const newResponse = h.response({
-          status: 'fail',
-          message: 'Anda tidak berhak mengakses resource ini',
-        });
-        newResponse.code(response.statusCode);
-        return newResponse;
-      }
 
       if (response instanceof NotFoundError) {
         const newResponse = h.response({
@@ -147,7 +139,16 @@ const init = async () => {
         });
         newResponse.code(response.statusCode);
         return newResponse;
-      } 
+      }
+
+      if (response instanceof AuthorizationError) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: 'Anda tidak berhak mengakses resource ini',
+        });
+        newResponse.code(response.statusCode);
+        return newResponse;
+      }
 
       if (response instanceof ClientError) {
         const newResponse = h.response({
@@ -158,9 +159,28 @@ const init = async () => {
         return newResponse;
       }
 
+      if (response instanceof AuthenticationError) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: 'Anda dibatasi untuk mengakses resource ini',
+        });
+        newResponse.code(response.statusCode);
+        return newResponse;
+      }
+
+      if (response instanceof ClientError) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: 'Gagal karena refresh token tidak valid',
+        });
+        newResponse.code(response.statusCode);
+        return newResponse;
+      }
+
       if (!response.isServer) {
         return h.continue;
       }
+      
       const newResponse = h.response({
         status: 'error',
         message: 'terjadi kegagalan pada server kami',
@@ -174,7 +194,7 @@ const init = async () => {
     }
     return h.continue;
   });
-
+  
   await server.start();
   console.log(`Server berjalan pada ${server.info.uri}`);
 };
