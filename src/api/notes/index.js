@@ -1,4 +1,4 @@
-//untuk plugin akan disimpan pada file ini
+//plugin akan disimpan pada file ini
 const NotesHandler = require('./handler');
 const routes = require('./routes');
  
