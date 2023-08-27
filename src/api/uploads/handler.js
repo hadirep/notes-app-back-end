@@ -1,11 +1,11 @@
-const ClientError = require('../../exceptions/ClientError');
+const autoBind = require('auto-bind');
 
 class UploadsHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
 
-    this.postUploadImageHandler = this.postUploadImageHandler.bind(this);
+    autoBind(this);
   }
 
   async postUploadImageHandler(request, h) {
